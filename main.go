@@ -1,8 +1,10 @@
 package main
 
 import (
-	"newretail-homework/config"
-	"newretail-homework/routes"
+	"log"
+	config "newretail-homework/config"
+	route "newretail-homework/routes"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,13 +12,20 @@ import (
 
 func main() {
 
+    db := config.InitDB()
 
-    r := gin.Default()
+	r := gin.Default()
 
-	config.ConnectDB()
-	routes.RegisterRoutes(r)
+	// 設定路由
+	route.Customer(r, db)
+	route.Coupon(r, db)
 
-	r.Run(":8080")
+    port := os.Getenv("PORT")
+    if port == "" {
+		log.Fatal("PORT environment variable is not set")
+	}
 
+	// 啟動伺服器
+	r.Run(":" + port)
 	
 }

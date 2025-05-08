@@ -1,8 +1,8 @@
-package models
+package model
 
 import "time"
 
-type Purchases struct {
+type Purchase struct {
 	ID            uint      `gorm:"primaryKey"`
 	Customer_Id   uint    `gorm:"size:100"`
 	Amount        float64    `gorm:"size:100"`

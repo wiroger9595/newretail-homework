@@ -1,4 +1,4 @@
-package models
+package model
 
 import "time"
 
@@ -6,8 +6,8 @@ import "time"
 type CouponType string
 
 const (
-	Discount CouponType = "discount"
-	Cash     CouponType = "cash"
+	Discount CouponType = "D"
+	Fill     CouponType = "F"
 )
 
 type Coupon struct {

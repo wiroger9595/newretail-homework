@@ -1,6 +1,6 @@
-package models
+package model
 
 type CustomerTag struct {
-	CustomerID uint   // 外鍵對應 customers
+	CustomerID uint  
 	Tag        string 
 }
