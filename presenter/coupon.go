@@ -1,41 +1,25 @@
 package presenter
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"newretail-homework/view"
-	"time"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
 
-func ClaimCouponWithRetry(db *gorm.DB, userID int, couponID int, maxRetries int) error {
-    for i := 0; i < maxRetries; i++ {
-        err, _, _ := TryClaimCoupon(db, userID, couponID)
-        if err == nil {
-            return nil // 成功
-        }
-
-        
-
-        log.Printf("第 %d 次嘗試失敗：%v，重試中...\n", i+1, err)
-        time.Sleep(100 * time.Millisecond) // 可用 Exponential Backoff
-    }
-
-    return fmt.Errorf("領取失敗：超過最大重試次數")
-}
-
-func TryClaimCoupon(db *gorm.DB, userID int, couponID int) ([]view.CouponResponse, map[uint]float64, error) {
+func TryClaimCoupon(db *gorm.DB, rdb *redis.Client, ctx context.Context, userID int, couponID int, userLevel string) ([]view.CouponResponse, map[uint]bool, error) {
     var responses []view.CouponResponse
-	resultMap := make(map[uint]float64)
+	resultMap := make(map[uint]bool)
 
 	err := db.Transaction(func(tx *gorm.DB) error {
 		res := tx.Exec(`
 			UPDATE coupon
 			SET quantity = quantity - 1
-			WHERE id = ? AND quantity > 0 AND end_time > now()
-		`, couponID)
+			WHERE id = ? AND quantity > 0 AND end_time > now() AND coupon_level = ?
+		`, couponID, userLevel)
 
 		if res.Error != nil {
 			return fmt.Errorf("update coupon failed: %w", res.Error)
@@ -47,7 +31,7 @@ func TryClaimCoupon(db *gorm.DB, userID int, couponID int) ([]view.CouponRespons
 
 		err := tx.Exec(`
 			INSERT INTO user_coupon (user_id, coupon_id, claimed_at, status)
-			VALUES (?, ?, now(), 'used')
+			VALUES (?, ?, now(), 'unused')
 		`, userID, couponID).Error
 		if err != nil {
 			return fmt.Errorf("insert user_coupon failed: %w", err)
@@ -58,7 +42,14 @@ func TryClaimCoupon(db *gorm.DB, userID int, couponID int) ([]view.CouponRespons
 			UserId:   userID,
 			CouponId: couponID,
 		})
-		resultMap[uint(couponID)] = 0.85
+		resultMap[uint(couponID)] = true
+
+
+    // Redis 寫入 user_coupon key
+		redisKey := fmt.Sprintf("user_coupon:%d:%d", userID, couponID)
+		if err := rdb.Set(ctx, redisKey, true, 0).Err(); err != nil {
+			return fmt.Errorf("failed to update redis user_coupon: %w", err)
+		}
 
 		return nil
 	})

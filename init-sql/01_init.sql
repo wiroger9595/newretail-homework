@@ -7,6 +7,9 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'coupon_status') THEN
         CREATE TYPE coupon_status AS ENUM ('unused', 'used', 'expired');
     END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'customer_level') THEN
+        CREATE TYPE level_type AS ENUM ('NEW', 'VIP', 'SLIVER', 'COPPER');
+    END IF;
 END$$;
 
 -- customer 表
@@ -16,6 +19,7 @@ CREATE TABLE IF NOT EXISTS customer (
     area_code VARCHAR(6),
     email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(20),
+    customer_level level_type NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_active_at TIMESTAMP
 );
@@ -28,13 +32,6 @@ CREATE TABLE IF NOT EXISTS purchase (
     purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- customer_tag 表
-CREATE TABLE IF NOT EXISTS customer_tag (
-    customer_id INT REFERENCES customer(id) ON DELETE CASCADE,
-    tag VARCHAR(50),
-    PRIMARY KEY (customer_id, tag)
-);
-
 -- coupon 表
 CREATE TABLE IF NOT EXISTS coupon (
     id SERIAL PRIMARY KEY,
@@ -42,6 +39,7 @@ CREATE TABLE IF NOT EXISTS coupon (
     type coupon_type NOT NULL,
     value DECIMAL NOT NULL,
     quantity INT NOT NULL,
+    coupon_level level_type NOT NULL,
     start_time TIMESTAMP,
     end_time TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

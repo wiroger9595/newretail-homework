@@ -1,9 +1,9 @@
-INSERT INTO customer (name, email, area_code, phone, last_active_at) VALUES
-('Alice Chen', 'alice@example.com', '886','0912345678', NOW() - INTERVAL '5 days'),
-('Bob Wang', 'bob@example.com', '886','0922333444', NOW() - INTERVAL '10 days'),
-('Charlie Lin', 'charlie@example.com', '886','0933444555', NOW() - INTERVAL '2 days'),
-('Doris Wu', 'doris@example.com', '886','0966778899', NOW() - INTERVAL '1 day'),
-('Eric Tsai', 'eric@example.com', '886', '0955667788', NOW());
+INSERT INTO customer (name, email, area_code, phone, customer_level, last_active_at) VALUES
+('Alice Chen', 'alice@example.com', '886','0912345678', 'NEW', NOW() - INTERVAL '5 days'),
+('Bob Wang', 'bob@example.com', '886','0922333444', 'SLIVER', NOW() - INTERVAL '10 days'),
+('Charlie Lin', 'charlie@example.com', '886','0933444555', 'VIP', NOW() - INTERVAL '2 days'),
+('Doris Wu', 'doris@example.com', '886','0966778899', 'NEW', NOW() - INTERVAL '1 day'),
+('Eric Tsai', 'eric@example.com', '886', '0955667788', 'SLIVER', NOW());
 
 -- purchase
 INSERT INTO purchase (customer_id, amount, purchased_at) VALUES
@@ -16,20 +16,13 @@ INSERT INTO purchase (customer_id, amount, purchased_at) VALUES
 (5, 299.00, NOW() - INTERVAL '3 days');
 
 
--- customer_tags
-INSERT INTO customer_tag (customer_id, tag) VALUES
-(1, 'VIP'),
-(2, 'New'),
-(3, 'Frequent Buyer'),
-(4, 'New'),
-(5, 'High Spender');
-
 -- coupon
-INSERT INTO coupon (name, type, value, quantity, start_time, end_time) VALUES
-('100元折扣券', 'discount', 100, 10, NOW() - INTERVAL '1 day', NOW() + INTERVAL '7 days'),
-('9折優惠券', 'discount', 0.9, 5, NOW(), NOW() + INTERVAL '10 days'),
-('買2送1', 'fill', 200, 1, NOW() - INTERVAL '1 days', NOW() - INTERVAL '6 day');
-('200元限時折扣', 'discount', 200, 3, NOW() - INTERVAL '3 days', NOW() - INTERVAL '5 day');
+INSERT INTO coupon (name, type, value, quantity, coupon_level, start_time, end_time) VALUES
+('100元折扣券', 'discount', 100, 10, 'NEW',NOW() - INTERVAL '1 day', NOW() + INTERVAL '7 days'),
+('9折優惠券', 'discount', 0.9, 5, 'SLIVER', NOW(), NOW() + INTERVAL '10 days'),
+('5折優惠券', 'discount', 0.5, 2, 'VIP', NOW(), NOW() + INTERVAL '3 days'),
+('買2送1', 'fill', 200, 1, 'COPPER', NOW() - INTERVAL '1 days', NOW() - INTERVAL '6 day'),
+('1000元限時折扣', 'discount', 1000, 3, 'SLIVER',NOW() - INTERVAL '3 days', NOW() - INTERVAL '5 day');
 
 
 

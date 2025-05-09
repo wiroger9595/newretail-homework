@@ -14,11 +14,13 @@ func main() {
 
     db := config.InitDB()
 
+	rdb := config.InitRedis() 
+
 	r := gin.Default()
 
 	// 設定路由
 	route.Customer(r, db)
-	route.Coupon(r, db)
+	route.Coupon(r, db, rdb)
 
     port := os.Getenv("PORT")
     if port == "" {
