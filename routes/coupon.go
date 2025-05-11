@@ -35,7 +35,6 @@ func Coupon(r *gin.Engine, db *gorm.DB, rdb *redis.Client) {
 			return
 		}
 
-		// 先從 Redis 扣數量
 		couponKey := fmt.Sprintf("coupon:%d", req.CouponId)
 		remaining, err := rdb.Decr(ctx, couponKey).Result()
 		if err != nil {
@@ -44,7 +43,6 @@ func Coupon(r *gin.Engine, db *gorm.DB, rdb *redis.Client) {
 		}
 
         if remaining < 0 {
-			// 把 Redis 補回去
 			rdb.Incr(ctx, couponKey)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Coupon sold out"})
 			return

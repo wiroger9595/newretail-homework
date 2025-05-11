@@ -15,7 +15,6 @@ import (
 func LoadCouponsToRedis(rdb *redis.Client, db *gorm.DB) error {
 	ctx := context.Background()
 
-
 	var coupons []struct {
 		ID       int
 		Quantity int

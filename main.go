@@ -13,12 +13,8 @@ import (
 func main() {
 
     db := config.InitDB()
-
 	rdb := config.InitRedis() 
-
 	r := gin.Default()
-
-	// 設定路由
 	route.Customer(r, db)
 	route.Coupon(r, db, rdb)
 
@@ -26,8 +22,6 @@ func main() {
     if port == "" {
 		log.Fatal("PORT environment variable is not set")
 	}
-
-	// 啟動伺服器
 	r.Run(":" + port)
 	
 }

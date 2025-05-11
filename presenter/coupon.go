@@ -37,15 +37,12 @@ func TryClaimCoupon(db *gorm.DB, rdb *redis.Client, ctx context.Context, userID 
 			return fmt.Errorf("insert user_coupon failed: %w", err)
 		}
 
-		// 你也可以這裡查詢資料、組合返回結果
 		responses = append(responses, view.CouponResponse{
 			UserId:   userID,
 			CouponId: couponID,
 		})
 		resultMap[uint(couponID)] = true
 
-
-    // Redis 寫入 user_coupon key
 		redisKey := fmt.Sprintf("user_coupon:%d:%d", userID, couponID)
 		if err := rdb.Set(ctx, redisKey, true, 0).Err(); err != nil {
 			return fmt.Errorf("failed to update redis user_coupon: %w", err)

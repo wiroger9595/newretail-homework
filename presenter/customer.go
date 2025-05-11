@@ -27,6 +27,7 @@ func FindTargetCustomers(db *gorm.DB, sinceDays int, minAmount float64) ([]view.
     `, since, minAmount).Rows()
 
     if err != nil {
+		log.Fatal("no exist client")
 		return nil, nil, err
 	}
 	defer rows.Close()
@@ -38,8 +39,6 @@ func FindTargetCustomers(db *gorm.DB, sinceDays int, minAmount float64) ([]view.
 		}
 		results = append(results, r)
 	}
-
-
     return results, spendMap, nil
 }
 
